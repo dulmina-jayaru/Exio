@@ -12,21 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-// Define the notification lists
-const withoutAccount = [
-  { title: "Up To 10 Questions." },
-  { title: "Always Free." },
-];
-
-const withAccount = [
-  { title: "Up To 20 Questions." },
-  { title: "Always Free." },
-];
-
-// Define the type for component props
-type Step1Props = React.HTMLProps<HTMLDivElement> & { className?: string };
-
-export default function Step1({ className, ...props }: Step1Props) {
+export default function Step1() {
   const [questions, setQuestions] = useState([]);
 
   useEffect(() => {
@@ -52,7 +38,7 @@ export default function Step1({ className, ...props }: Step1Props) {
         <h1 className="text-4xl font-bold text-center p-10">Choose One Option To Continue.</h1>
         <div className="w-full flex justify-center items-center">
           {/* Card for "Without An Account" */}
-          <Card className={cn("w-[380px]", className)} {...props}>
+          <Card className={cn("w-[380px]")}>
             <CardHeader>
               <CardTitle>Without An Account</CardTitle>
               <CardDescription>Go Without An Account.</CardDescription>
@@ -82,7 +68,7 @@ export default function Step1({ className, ...props }: Step1Props) {
           </Card>
           <h1 className="p-10 text-xl">OR</h1>
           {/* Card for "With An Account" */}
-          <Card className={cn("w-[380px]", className)} {...props}>
+          <Card className={cn("w-[380px]")}>
             <CardHeader>
               <CardTitle>With An Account</CardTitle>
               <CardDescription>Go With An Account.</CardDescription>
