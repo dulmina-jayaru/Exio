@@ -53,7 +53,7 @@ interface AnswerData {
 }
 
 const QuizContent = () => {
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams(); // No destructuring here
   const [questionData, setQuestionData] = useState<QuestionData | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
