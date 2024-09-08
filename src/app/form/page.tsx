@@ -27,7 +27,7 @@ import { useRouter } from 'next/navigation';
 const formSchema = z.object({
   category: z.string().min(2, { message: "Category must be at least 2 characters." }),
   age: z.string().min(1, { message: "Age must be a positive number." }),
-  timeLimit: z.string().optional(), // Make timeLimit optional in the schema
+  timeLimit: z.string().optional(),
   numberOfQuestions: z.string(),
 });
 
@@ -40,11 +40,9 @@ export default function StepForm() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const formData = { ...values }; // Create a copy of form data
-
-    // Handle optional timeLimit based on switch state
+    const formData = { ...values }; 
     if (!isTimeLimitEnabled) {
-      delete formData.timeLimit; // Remove timeLimit if switch is off
+      delete formData.timeLimit; 
     }
 
     navigation.push(`/questions?category=${values.category}&age=${values.age}&timeLimit=${values.timeLimit}&numberOfQuestions=${values.numberOfQuestions}`); // Send data using state

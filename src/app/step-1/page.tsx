@@ -50,7 +50,7 @@ export default function Step1({ className, ...props }: CardProps) {
     };
 
     fetchQuestions();
-  }, []); // Empty dependency array to run effect only once on mount
+  }, []);
 
   return (
     <main className="h-screen w-full bg-slate-200">
