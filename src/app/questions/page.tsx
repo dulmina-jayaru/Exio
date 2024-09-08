@@ -4,7 +4,7 @@ import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import Image from 'next/image';
-import { correct, wrong, gold_trophy, loading_question } from '../../../assets';
+import { correct, wrong, gold_tropy, loading_question } from '../../../assets';
 import Link from 'next/link';
 import {
   AlertDialog,
