@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from 'react';
 import { BellRing, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -12,27 +12,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+// Define the notification lists
 const withoutAccount = [
-  {
-    title: "Up To 10 Questions.",
-  },
-  {
-    title: "Always Free.",
-  },
+  { title: "Up To 10 Questions." },
+  { title: "Always Free." },
 ];
 
 const withAccount = [
-  {
-    title: "Up To 20 Questions.",
-  },
-  {
-    title: "Always Free.",
-  },
+  { title: "Up To 20 Questions." },
+  { title: "Always Free." },
 ];
 
-type CardProps = React.ComponentProps<typeof Card>;
+// Define the type for component props
+type Step1Props = React.HTMLProps<HTMLDivElement> & { className?: string };
 
-export default function Step1({ className, ...props }: CardProps) {
+export default function Step1({ className, ...props }: Step1Props) {
   const [questions, setQuestions] = useState([]);
 
   useEffect(() => {
@@ -55,8 +49,9 @@ export default function Step1({ className, ...props }: CardProps) {
   return (
     <main className="h-screen w-full bg-slate-200">
       <div className="w-full h-full pt-[200px]">
-        <h1 className="text-4xl font-bold text-center p-10">Chose One Option To Continue.</h1>
+        <h1 className="text-4xl font-bold text-center p-10">Choose One Option To Continue.</h1>
         <div className="w-full flex justify-center items-center">
+          {/* Card for "Without An Account" */}
           <Card className={cn("w-[380px]", className)} {...props}>
             <CardHeader>
               <CardTitle>Without An Account</CardTitle>
@@ -86,6 +81,7 @@ export default function Step1({ className, ...props }: CardProps) {
             </CardFooter>
           </Card>
           <h1 className="p-10 text-xl">OR</h1>
+          {/* Card for "With An Account" */}
           <Card className={cn("w-[380px]", className)} {...props}>
             <CardHeader>
               <CardTitle>With An Account</CardTitle>
