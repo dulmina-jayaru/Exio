@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import Image from 'next/image';
-import { correct, wrong, gold_tropy, loading_question } from '../../../assets';
+import { correct, wrong, gold_trophy, loading_question } from '../../../assets';
 import Link from 'next/link';
 import {
   AlertDialog,
@@ -52,8 +52,8 @@ interface AnswerData {
   isCorrect: boolean;
 }
 
-const SecondPage: React.FC = () => {
-  const searchParams = useSearchParams();
+const QuizContent = () => {
+  const [searchParams] = useSearchParams();
   const [questionData, setQuestionData] = useState<QuestionData | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -64,6 +64,7 @@ const SecondPage: React.FC = () => {
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState(0);
+  const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
 
   const resetTimer = (timeLimit: number) => {
@@ -309,6 +310,13 @@ const SecondPage: React.FC = () => {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  );
+};
+const SecondPage: React.FC = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <QuizContent />
+    </Suspense>
   );
 };
 
