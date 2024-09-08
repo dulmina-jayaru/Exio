@@ -65,7 +65,6 @@ const QuizContent = () => {
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState(0);
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
-  const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
 
   const resetTimer = (timeLimit: number) => {
     setTimer(timeLimit * 60);
