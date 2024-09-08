@@ -1,24 +1,20 @@
 "use client";
+
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import Image from 'next/image';
-import { correct, wrong, gold_tropy } from '../../../assets';
-import { ArrowBigRightDashIcon } from 'lucide-react';
+import { correct, wrong, gold_tropy, loading_question } from '../../../assets';
 import Link from 'next/link';
 import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { loading_question } from '../../../assets';
 import {
   Drawer,
   DrawerClose,
@@ -38,66 +34,72 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
 
 const loadingMessages = ["Fetching...", "AI Is Working On It...."];
 
-const SecondPage = () => {
+interface QuestionData {
+  question: string;
+  answers: string[];
+  correct_answer: string;
+  explanation: string;
+}
+
+interface AnswerData {
+  question: string;
+  selectedAnswer: string;
+  correctAnswer: string;
+  explanation: string;
+  isCorrect: boolean;
+}
+
+const SecondPage: React.FC = () => {
   const searchParams = useSearchParams();
-  const [questionData, setQuestionData] = useState(null);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [dialogVisible, setDialogVisible] = useState(false);
-  const [dialogCorrect, setDialogCorrect] = useState(false);
-  const [dialogExplanation, setDialogExplanation] = useState("");
+  const [questionData, setQuestionData] = useState<QuestionData | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [loadingText, setLoadingText] = useState(loadingMessages[0]);
-  const [restartAnimation, setRestartAnimation] = useState(false);
-  const [savedQuestionData, setSavedQuestionData] = useState([]);
+  const [savedQuestionData, setSavedQuestionData] = useState<AnswerData[]>([]);
   const [timer, setTimer] = useState(0);
   const [pauseTimer, setPauseTimer] = useState(false);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState(0);
-  const [limit, setLimit] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
 
-  const resetTimer = (timeLimit) => {
+  const resetTimer = (timeLimit: number) => {
     setTimer(timeLimit * 60);
   };
 
   const fetchQuestion = async () => {
     try {
-      const numberOfQuestions = parseInt(searchParams.get("numberOfQuestions"));
+      const numberOfQuestions = parseInt(searchParams.get("numberOfQuestions") || "0");
       setTotalQuestions(numberOfQuestions);
       if (answeredQuestions < numberOfQuestions) {
-        const category = searchParams.get('category');
-        const age = searchParams.get('age');
+        const category = searchParams.get('category') || '';
+        const age = searchParams.get('age') || '';
         setLoadingText(loadingMessages[Math.floor(Math.random() * loadingMessages.length)]);
-        console.log(`http://${process.env.NEXT_PUBLIC_API_URL}/generate-random-question/${category}/${age}`);
-        const response = await fetch(`http://${process.env.NEXT_PUBLIC_API_URL}/generate-random-question/${category}/${age}`);
+        const response = await fetch(`https://server-production-2de3.up.railway.app/generate-random-question/${category}/${age}`);
 
         if (!response.ok) {
           throw new Error(`Failed to fetch question: ${response.status} - ${response.statusText}`);
         }
 
-        const data = await response.json();
+        const data: QuestionData = await response.json();
         setQuestionData(data);
         setPauseTimer(false);
         setSelectedAnswer(null);
-      } else {
-        setLimit(true);
       }
     } catch (error) {
-      console.error('Error fetching question:', error.message);
-      alert(`Error: ${error.message}`);
+      console.error('Error fetching question:', error);
+      alert(`Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`);
     }
   };
 
   const handleNext = () => {
-    if (answeredQuestions < totalQuestions && selectedAnswer) {
+    if (answeredQuestions < totalQuestions && selectedAnswer && questionData) {
       const isCorrect = selectedAnswer === questionData.correct_answer;
 
-      const answerData = {
+      const answerData: AnswerData = {
         question: questionData.question,
         selectedAnswer: selectedAnswer,
         correctAnswer: questionData.correct_answer,
@@ -124,17 +126,12 @@ const SecondPage = () => {
     }
   };
 
-  const handlePrevious = () => {
-    // Logic for moving to the previous question
-  };
-
-  const handleAnswerSelect = (answer) => {
+  const handleAnswerSelect = (answer: string) => {
     setSelectedAnswer(answer);
   };
 
   useEffect(() => {
     if (!timer || pauseTimer) return;
-    const score = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
 
     const intervalId = setInterval(() => {
       setTimer((prevTime) => prevTime - 1);
@@ -145,36 +142,26 @@ const SecondPage = () => {
 
   useEffect(() => {
     setPauseTimer(true);
-    const numberOfQuestions = parseInt(searchParams.get("numberOfQuestions"));
+    const numberOfQuestions = parseInt(searchParams.get("numberOfQuestions") || "0");
     setTotalQuestions(numberOfQuestions);
-    resetTimer(searchParams.get("timeLimit"));
+    resetTimer(parseInt(searchParams.get("timeLimit") || "0"));
     fetchQuestion();
-
-    if (restartAnimation) {
-      setTimeout(() => {
-        setRestartAnimation(false);
-      }, 500);
-    }
   }, [searchParams]);
 
-  useEffect(() => {
-    const score = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
-  }, [correctAnswers, totalQuestions]);
-
-  const formatTime = (time) => {
+  const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
-  const getAnswerButtonClass = (answer) => {
+  const getAnswerButtonClass = (answer: string) => {
     if (!isAnswerSubmitted) {
       return selectedAnswer === answer ? 'bg-gray-200' : '';
     }
-    if (answer === questionData.correct_answer) {
+    if (answer === questionData?.correct_answer) {
       return 'bg-green-200';
     }
-    if (answer === selectedAnswer && selectedAnswer !== questionData.correct_answer) {
+    if (answer === selectedAnswer && selectedAnswer !== questionData?.correct_answer) {
       return 'bg-red-200';
     }
     return '';
@@ -218,7 +205,6 @@ const SecondPage = () => {
                   ))}
                   
                   <div className="flex justify-between">
-                    <Button onClick={handlePrevious} disabled={isAnswerSubmitted}>Previous</Button>
                     {questionData && answeredQuestions === totalQuestions ? (
                       <Drawer>
                         <DrawerTrigger>
@@ -261,7 +247,7 @@ const SecondPage = () => {
                             </DrawerHeader>
                           </div>
                           <DrawerFooter>
-                            <Link href={"/form"}>
+                            <Link href="/form">
                               <Button className='w-full'>Do It Again</Button>
                             </Link>
                             <DrawerClose>
